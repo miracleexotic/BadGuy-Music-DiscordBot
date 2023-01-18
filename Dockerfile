@@ -2,8 +2,8 @@
 
 FROM python:3.10-slim-buster
 
-RUN apt-get update \
-    && apt-get dist-upgrade \
+RUN apt-get update -y \
+    && apt-get dist-upgrade -y \
     && apt-get install -y software-properties-common \
     && add-apt-repository ppa:mc3man/trusty-media \
     && apt-get install -y --no-install-recommends \
