@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: badguy-deployment
+  labels:
+    app: badguy-music-discordbot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: badguy-music-discordbot
+  template:
+    metadata:
+      labels:
+        app: badguy-music-discordbot
+    spec:
+      containers:
+      - name: badguy-music-discordbot
+        image: 3mper0r/badguy-music-discord
