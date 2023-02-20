@@ -6,9 +6,9 @@ from discord.ext import commands
 
 from views import search_view
 
-import youtube_dl
+import yt_dlp
 
-youtube_dl.utils.bug_reports_message = lambda: ''
+yt_dlp.utils.bug_reports_message = lambda: ''
 
 class YTDLError(Exception):
     pass
@@ -33,10 +33,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
     FFMPEG_OPTIONS = {
         'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
         'options': '-vn',
-        # 'executable': r'C:\Users\IAMMAI\Desktop\githubProject\BadGuyBot\BadGuyBot-master\ffmpeg\bin\ffmpeg.exe'
+        'executable': r'C:\Users\IAMMAI\Desktop\githubProject\BadGuyBot\BadGuyBot-master\ffmpeg\bin\ffmpeg.exe'
     }
 
-    ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
+    ytdl = yt_dlp.YoutubeDL(YTDL_OPTIONS)
 
     def __init__(self, ctx: commands.Context, source: discord.FFmpegPCMAudio, *, data: dict, volume: float = 0.5):
         super().__init__(source, volume)
