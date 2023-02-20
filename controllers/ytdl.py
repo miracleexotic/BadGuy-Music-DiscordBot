@@ -33,7 +33,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     FFMPEG_OPTIONS = {
         'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
         'options': '-vn',
-        'executable': r'C:\Users\IAMMAI\Desktop\githubProject\BadGuyBot\BadGuyBot-master\ffmpeg\bin\ffmpeg.exe'
+        # 'executable': r'C:\Users\IAMMAI\Desktop\githubProject\BadGuyBot\BadGuyBot-master\ffmpeg\bin\ffmpeg.exe'
     }
 
     ytdl = yt_dlp.YoutubeDL(YTDL_OPTIONS)
