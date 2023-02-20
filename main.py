@@ -7,7 +7,7 @@ from discord.ext import commands
 class MyBot(commands.Bot):
     def __init__(self, *, intents: discord.Intents) -> None:
         super().__init__(
-            command_prefix=">",
+            command_prefix="|",
             description="Playing music 🌠", 
             intents=intents)
 
