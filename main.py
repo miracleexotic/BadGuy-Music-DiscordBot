@@ -16,8 +16,8 @@ class MyBot(commands.Bot):
         await self.load_extension("cogs.voice_member_count")
 
     async def on_ready(self):
-        # activity = discord.Game(name='|play <music>')
-        activity = discord.Game(name='maintenance BadGuy')
+        activity = discord.Game(name='|play <music>')
+        # activity = discord.Game(name='maintenance BadGuy')
         await self.change_presence(activity=activity)
         print(f'Logged in as {self.user.name}')
 
