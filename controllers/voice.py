@@ -45,23 +45,23 @@ class Song:
         self.requester = source.requester
 
     def create_embed(self):
-        embed = (discord.Embed(title='Now playing', description='```css\n{0.source.title}\n```'.format(self), color=discord.Color.blurple())
+        embed = (discord.Embed(title='Now playing', description=f'```css\n{self.source.title}\n```', color=discord.Color.blurple())
                 .add_field(name='Duration', value=self.source.duration)
-                .add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
-                .add_field(name='URL', value='[Click]({0.source.url})'.format(self))
+                .add_field(name='Uploader', value=f'[{self.source.uploader}]({self.source.uploader_url})')
+                .add_field(name='URL', value=f'[Click]({self.source.url})')
                 .set_thumbnail(url=self.source.thumbnail)
                 .set_author(name=self.requester.display_name, icon_url=self.requester.display_avatar)
                 )
         return embed
 
     def create_embed_spf(self):
-        embed = (discord.Embed(title='🌿   Now playing', description='```css\n{0.source.title}\n```'.format(self), color=discord.Color.green())
+        embed = (discord.Embed(title='🌿   Now playing', description=f'```css\n{self.source.title}\n```', color=discord.Color.green())
                 .set_thumbnail(url=self.source.thumbnail))
         return embed
 
     def create_embed_history_loop(self):
         embed = (discord.Embed(title='🍂   Repeat from history', color=discord.Color.magenta())
-                .add_field(name='Now playing', value='```css\n{0.source.title}\n```'.format(self))
+                .add_field(name='Now playing', value=f'```css\n{self.source.title}\n```')
                 .add_field(name='Requested by', value=self.requester.mention)
                 .set_thumbnail(url=self.source.thumbnail))
         return embed
@@ -94,10 +94,9 @@ class VoiceState:
         self.bot = bot
         self._ctx = ctx
 
-        self.current = None
-        self.voice = None
+        self.current: Song | None = None
+        self.voice: discord.voice_client.VoiceClient | None = None
         self.next = asyncio.Event()
-        self.completed = asyncio.Event()
         self.songs = SongQueue()
         self.song_history = []
         self.exists = True
@@ -174,7 +173,7 @@ class VoiceState:
         """Show error and Stop audio player task."""
 
         logger.error(str(e), exc_info=True)
-        await self._ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+        await self._ctx.send(f'An error occurred while processing this request: {str(e)}')
         self.bot.loop.create_task(self.stop())
         self.exists = False
 
@@ -186,10 +185,9 @@ class VoiceState:
             :class:`##History-loop##` : play from history
         """
 
-        logger.debug(f'Waiting for getting song...')
+        logger.debug('Waiting for getting song...')
         self.current = await self.songs.get()
-        # print(f'Song: {self.current.source.title} @ {self.voice.channel.id}')
-        logger.info(f'Song: {str(self.current.source.title).encode("utf-8")} @ {str(self.voice.channel.id)}')
+        logger.info(f'[i] Song: {str(self.current.source.title).encode("utf-8")} @ {str(self.voice.channel.id)}')
         if self.current.source.title == "##Spotify##":
             self.spotify = True
             self.play_next_song()
@@ -205,22 +203,19 @@ class VoiceState:
 
         view = audio_player.AudioPlayerView(self.bot, self._ctx)
 
-        logger.info('Start')
         self.song_history.insert(0, self.current)
         self.current.source.volume = self._volume    # -- adjust volume from source.
         await self.current.source.channel.send(embed=self.current_embed, view=view)
-        logger.debug(f'Playing song...')
+        logger.info('[+] Starting')
         self.voice.play(self.current.source, after=self.play_next_song)
-        if not self.voice.is_playing():
-            self.voice.play(self.current.source, after=lambda e: print(f'Player error: {e}') if e else None)
-        self.completed.set()
+        logger.info('[+] Playing song...')
     
     async def play_source(self):
         """Play song in queue."""
 
         try:
             async with timeout(PLAYER_TIMEOUT): 
-                logger.debug(f'empty:{self.songs.empty()} && autoplay:{self.autoplay} && spotify:{self._spotify} && history:{self.history_loop}')
+                logger.debug(f'[ empty:{self.songs.empty()} && autoplay:{self.autoplay} && spotify:{self._spotify} && history:{self.history_loop} ]')
                 
                 ok = await self.getCurrentSong()
                 if not ok:
@@ -229,7 +224,7 @@ class VoiceState:
                 self.current_embed = self.current.create_embed()
                 
         except asyncio.TimeoutError:
-            logger.error('Timeout')
+            logger.error('[!] Timeout')
             raise TimeoutError
 
         await self.playCurrentSong()
@@ -292,8 +287,8 @@ class VoiceState:
 
         try:
             async with timeout(PLAYER_TIMEOUT): 
-                logger.debug(f'empty:{self.songs.empty()} && autoplay:{self.autoplay} && spotify:{self._spotify} && history:{self.history_loop}')
-                time.sleep(5)  # wait for next music in spotify playlist1
+                logger.debug(f'[ empty:{self.songs.empty()} && autoplay:{self.autoplay} && spotify:{self._spotify} && history:{self.history_loop} ]')
+                time.sleep(5)  # wait for next music in spotify playlist
                 async with self._ctx.typing():
                     try:
                         source = await ytdl.YTDLSource.create_source(self._ctx, str(next(self.playlist)), loop=self.bot.loop)
@@ -303,7 +298,7 @@ class VoiceState:
                     else:
                         song = Song(source)
                         await self.songs.put(song)
-                        await self._ctx.send('Searching from Spotify Playlist \n> {}'.format(self._url))
+                        await self._ctx.send(f'Searching from Spotify Playlist \n> {self._url}')
                     
                 ok = await self.getCurrentSong()
                 if not ok:
@@ -312,17 +307,14 @@ class VoiceState:
                 self.current_embed = self.current.create_embed_spf()
 
         except asyncio.TimeoutError:
-            logger.error('Timeout')
+            logger.error('[!] Timeout')
             raise TimeoutError
 
-        logger.info('Start')
         self.current.source.volume = self._volume
         await self.current.source.channel.send(embed=self.current_embed)
-        logger.debug('Playing song...')
+        logger.info('[+] Starting')
         self.voice.play(self.current.source, after=self.play_next_song)
-        if not self.voice.is_playing():
-            self.voice.play(self.current.source, after=lambda e: print(f'Player error: {e}') if e else None)
-        self.completed.set()
+        logger.info('[+] Playing song...')
         return True
 
     def fetchHistory(self):
@@ -333,14 +325,14 @@ class VoiceState:
                 for song in self.song_history[-1::-1]:
                     yield song
             except StopIteration:
-                logger.warning('End of history list')
+                logger.warning('[X] End of history list')
 
     async def play_from_history(self):
         """Play song from history."""
 
         try:
             async with timeout(PLAYER_TIMEOUT): 
-                logger.debug(f'empty:{self.songs.empty()} && autoplay:{self.autoplay} && spotify:{self._spotify} && history:{self.history_loop}')
+                logger.debug(f'[ empty:{self.songs.empty()} && autoplay:{self.autoplay} && spotify:{self._spotify} && history:{self.history_loop} ]')
                 time.sleep(5)  # wait for next music in history
                 async with self._ctx.typing():
                     try:
@@ -359,66 +351,64 @@ class VoiceState:
                 self.current_embed = self.current.create_embed_history_loop()
                 
         except asyncio.TimeoutError:
-            logger.error('Timeout')
+            logger.error('[!] Timeout')
             raise TimeoutError
 
-        logger.info('Start')
         await self.current.source.channel.send(embed=self.current_embed)
-        logger.debug('Playing song...')
+        logger.info('[+] Starting')
         self.voice.play(self.current.source, after=self.play_next_song)
-        if not self.voice.is_playing():
-            self.voice.play(self.current.source, after=lambda e: print(f'Player error: {e}') if e else None)
-        self.completed.set()
+        logger.info('[+] Playing song...')
         return True
 
     async def audio_player_task(self):
         """Audio player."""
+        
+        logger.debug('--- Start Audio Player ---')
 
         while True:
-            logger.debug('--- Start player ---')
 
             # clear now source
             self.next.clear()
-            self.completed.clear()
             self.now = None
-            logger.debug(f'number of songs in queue: {self.songs}')
+            logger.debug(f'Queue: {self.songs.maxsize}')
 
             # exists
             if not self.exists:
+                logger.debug('--- Stop Audio Player ---')
                 return
 
             try:
                 # loop current source
                 if self.loop:
-                    logger.debug('**LOOP**')
+                    logger.debug('MODE: LOOP')
                     self.current = self.song_history[0]
                     self.now = discord.FFmpegPCMAudio(self.current.source.stream_url, **ytdl.YTDLSource.FFMPEG_OPTIONS)
                     self.voice.play(self.now, after=self.play_next_song)
 
                 # autoplay
                 elif self.autoplay:
-                    logger.debug('**AUTOPLAY**')
+                    logger.debug('MODE: AUTOPLAY')
                     ok = await self.play_autoplay()
                     if not ok:
                         continue
 
                 # spotify
                 elif self._spotify and self.songs.empty():
-                    logger.debug('**SPOTIFY**')
+                    logger.debug('MODE: SPOTIFY')
                     ok = await self.play_spotify()
                     if not ok:
                         continue
 
                 # history-loop
                 elif self.history_loop and self.songs.empty():
-                    logger.debug('**HISTORY-LOOP**')
+                    logger.debug('MODE: HISTORY-LOOP')
                     ok = await self.play_from_history()
                     if not ok:
                         continue
 
                 # other
                 else:
-                    logger.debug('**SOURCE**')
+                    logger.debug('MODE: SOURCE')
                     ok = await self.play_source()
                     if not ok:
                         continue
@@ -430,7 +420,7 @@ class VoiceState:
 
             # check member in voice channel
             await self.voiceMemberCount(self.voice.channel.id)
-            logger.info(f'Member( Count={self.voice_member_count} )')
+            logger.debug(f'Member: Count={self.voice_member_count}')
             if self.voice_member_count == 1:
                 self.bot.loop.create_task(self.stop())
                 self.exists = False
@@ -443,11 +433,9 @@ class VoiceState:
         Play next song for continue loop in Audio player.
         use after play song complete.
         """
-        self.completed.wait()
 
-        logger.info('Next song')
+        logger.info('>>> Next song >>>')
         if error:
-            print(error)
             logger.error(str(error), exc_info=True)
             raise VoiceError(str(error))
 
@@ -461,7 +449,7 @@ class VoiceState:
         Song will stop and after this call :func:`self.play_next_song`.
         """
 
-        logger.info('Skip song')
+        logger.info('>>> Skip song >>>')
         self.skip_votes.clear()
 
         if self.is_playing:
@@ -475,7 +463,7 @@ class VoiceState:
     async def stop(self):
         """Disconnect from voice channel"""
 
-        logger.warning(f'Stop playing song')
+        logger.warning(f'[X] Stop playing song')
         self.songs.clear()
         self._spotify = False
         self.exists = False
