@@ -22,7 +22,7 @@ class MyBot(commands.Bot):
         print(f'Logged in as {self.user.name}')
 
 def main():
-    intents = discord.Intents.default()
+    intents = discord.Intents.all()
     intents.message_content = True
     bot = MyBot(intents=intents)
     with open('authentication/config.json') as fh:
