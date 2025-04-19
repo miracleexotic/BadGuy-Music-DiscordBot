@@ -3,3 +3,5 @@
 ffmpeg/**
 test/**
 authentication/**
+logs/**
+databases/**
