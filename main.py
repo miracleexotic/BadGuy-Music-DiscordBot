@@ -4,30 +4,38 @@ import json
 import discord
 from discord.ext import commands
 
+from plugins import yt_cookies
+
+
 class MyBot(commands.Bot):
     def __init__(self, *, intents: discord.Intents) -> None:
         super().__init__(
-            command_prefix="|",
-            description="Playing music 🌠", 
-            intents=intents)
+            command_prefix="|", description="Playing music 🌠", intents=intents
+        )
 
     async def setup_hook(self) -> None:
         await self.load_extension("cogs.music")
         await self.load_extension("cogs.voice_member_count")
 
     async def on_ready(self):
-        activity = discord.Game(name='|play <music>')
-        # activity = discord.Game(name='maintenance BadGuy')
+        activity = discord.Game(name="|play <music>")
+        # activity = discord.Game(name="maintenance BadGuy")
         await self.change_presence(activity=activity)
-        print(f'Logged in as {self.user.name}')
+        print(f"Logged in as {self.user.name}")
+
 
 def main():
+
+    # Initial Plugins
+    yt_cookies.get_cookies()
+
+    # Running the bot
     intents = discord.Intents.all()
     intents.message_content = True
     bot = MyBot(intents=intents)
-    with open('authentication/config.json') as fh:
+    with open("authentication/config.json") as fh:
         bot.config = json.load(fh)
-    bot.run(bot.config['token'])
+    bot.run(bot.config["token"])
 
 
 if __name__ == "__main__":
