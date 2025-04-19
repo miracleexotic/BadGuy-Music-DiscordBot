@@ -27,7 +27,7 @@ class MyBot(commands.Bot):
 def main():
 
     # Initial Plugins
-    yt_cookies.get_cookies()
+    # yt_cookies.get_cookies()
 
     # Running the bot
     intents = discord.Intents.all()
