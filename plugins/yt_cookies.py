@@ -18,7 +18,7 @@ def get_cookies():
 
     cookie_data = driver.get_cookies()
 
-    file_path = "../databases/cookies.txt"
+    file_path = "databases/cookies.txt"
 
     # Save cookies to file in Netscape format
     with open(file_path, "w") as f:
