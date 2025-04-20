@@ -5,6 +5,7 @@ anyio==3.6.1
 async-timeout==4.0.2
 attrs==25.3.0
 beautifulsoup4==4.11.1
+bgutil-ytdlp-pot-provider==0.8.2
 Brotli==1.0.9
 bs4==0.0.1
 certifi==2025.1.31
@@ -52,3 +53,4 @@ wsproto==1.2.0
 yarl==1.8.1
 youtube-dl==2021.12.17
 yt-dlp==2025.3.31
+yt-dlp-get-pot==0.3.0
