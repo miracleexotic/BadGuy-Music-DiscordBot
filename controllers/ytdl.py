@@ -30,7 +30,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
         "no_warnings": True,
         "default_search": "ytsearch",
         "source_address": "0.0.0.0",
-        "cookiefile": "databases/cookies.txt",
+        # "cookiefile": "databases/cookies.txt",
+        "extractor_args": {
+            "youtube": {"getpot_bgutil_baseurl": "http://bgutil-provider:4416"}
+        },
     }
 
     FFMPEG_OPTIONS = {
