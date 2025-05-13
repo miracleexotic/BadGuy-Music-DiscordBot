@@ -38,8 +38,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
     }
 
     FFMPEG_OPTIONS = {
-        "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
-        "options": "-vn -http_proxy http://tor-proxy:8118",
+        "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -http_proxy http://tor-proxy:8118",
+        "options": "-vn",
         # 'executable': r'C:\Users\IAMMAI\Desktop\githubProject\BadGuyBot\BadGuyBot-master\ffmpeg\bin\ffmpeg.exe'
     }
 
