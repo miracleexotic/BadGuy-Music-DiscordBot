@@ -34,7 +34,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         "extractor_args": {
             "youtube": {"getpot_bgutil_baseurl": "http://bgutil-provider:4416"}
         },
-        "proxy": "http://147.75.34.92:443",
+        "proxy": "socks5://tor-proxy:9050",
     }
 
     FFMPEG_OPTIONS = {
