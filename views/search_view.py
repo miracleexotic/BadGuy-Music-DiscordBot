@@ -91,5 +91,6 @@ class SearchView(discord.ui.View):
     async def _cancel(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
+        await interaction.response.defer()
         self.value = "cancel"
         self.stop()
