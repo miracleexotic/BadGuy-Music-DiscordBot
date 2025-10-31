@@ -52,5 +52,5 @@ wrapt==1.14.1
 wsproto==1.2.0
 yarl==1.8.1
 youtube-dl==2021.12.17
-yt-dlp==2025.3.31
+yt-dlp==2025.10.22
 yt-dlp-get-pot==0.3.0
